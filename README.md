@@ -20,18 +20,16 @@ HTML
 OTA Firmwarecheck
 * php required, script included based on the standard examples.
 
-
 **Installation**
 (Instructions for macOS)
 
 * edit: ~/Library/Arduino15/packages/esp8266/hardware/esp8266/2.3.0 platform.txt  add "-lssl --allow-multiple-definition" to the end of the Linker row. (the row begins with compiler.c.elf.libs=)
 See http://www.delorie.com/gnu/docs/binutils/ld_3.html for information. The linker uses the first found definition)
 * symlink in Mqtt library "ln -s $(pwd)/lib/mqtt ~/Documents/Arduino/libraries/mqtt" or move it there
-
-**Author:**
-[Mikael "Murf" Mellgren](https://murf.se)
-
-Based on the [MQTT library for the ESP8266 ](https://github.com/tuanpmt/esp_mqtt) (thanks!) (Saved as a mangled)
+***Libraries used***
+* [MQTT library for the ESP8266 ](https://github.com/tuanpmt/esp_mqtt) By Tuanpmt (thanks!) (This is included in the repo for use by Arduino ESP8266) (MIT-License)
+* [WifiManager library for the ESP8266 ](https://github.com/tzapu/WiFiManager#install-through-library-manager) By Tzapu (MIT-License)
+* [ArduinoJson library for Arduino](https://github.com/bblanchon/ArduinoJson) (MIT-License)
 
 **Hardware**
 (This description is a mess sorry, please see included eagle files)
@@ -44,10 +42,11 @@ ESP8266 -03, GPIO 15 via 10k resistor to ground, CH_PD via 10k resistor to VCC 3
 ***Board***
 ![Board](images/board.png "Schematic")
 
-**LICENSE - "MIT License"**
+**Author:**
+[Mikael "Murf" Mellgren](https://murf.se)
 
+**LICENSE - "MIT License"**
 mqttSwitch2.0: Copyright (c) 2014-2016 Murf, https://murf.se
-esp_mqtt: Copyright (c) 2014-2015 Tuan PM, https://twitter.com/TuanPMT
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
