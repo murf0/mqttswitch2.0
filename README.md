@@ -23,9 +23,10 @@ OTA Firmwarecheck
 
 **Installation**
 (Instructions for macOS)
-edit: ~/Library/Arduino15/packages/esp8266/hardware/esp8266/2.3.0 platform.txt  add "-lssl --allow-multiple-definition" to the end of the Linker row. (the row begins with compiler.c.elf.libs=)
+
+* edit: ~/Library/Arduino15/packages/esp8266/hardware/esp8266/2.3.0 platform.txt  add "-lssl --allow-multiple-definition" to the end of the Linker row. (the row begins with compiler.c.elf.libs=)
 See http://www.delorie.com/gnu/docs/binutils/ld_3.html for information. The linker uses the first found definition)
-symlink in Mqtt library "ln -s $(pwd)/lib/mqtt ~/Documents/Arduino/libraries/mqtt" or move it there
+* symlink in Mqtt library "ln -s $(pwd)/lib/mqtt ~/Documents/Arduino/libraries/mqtt" or move it there
 
 **Author:**
 [Mikael "Murf" Mellgren](https://murf.se)
@@ -33,11 +34,15 @@ symlink in Mqtt library "ln -s $(pwd)/lib/mqtt ~/Documents/Arduino/libraries/mqt
 Based on the [MQTT library for the ESP8266 ](https://github.com/tuanpmt/esp_mqtt) (thanks!) (Saved as a mangled)
 
 **Hardware**
-GPIO2 is connected to a NPN transistor. Base Collector Emmiter. GPIO2 to 1k resistor to Base of a NPN 3906 Transistor. Collector is conneted to Ground, Emittor is connected to the Relay. groound of relay to 5.0v (USB)
+(This description is a mess sorry, please see included eagle files)
+GPIO2 is connected to the base of a NPN3906 transistor via a 1k resistor. Collector is conneted to Ground, Emittor is connected to the Relay. the Groound of relay to 5.0v (USB)
 ESP8266 -03, GPIO 15 via 10k resistor to ground, CH_PD via 10k resistor to VCC 3.3v regulator AMS1117 connected to VCC5.0
-arduin
 
-See attached eagle files.
+***Schematic***
+![Schematic](images/schematic.png "Schematic")
+
+***Board***
+![Board](images/board.png "Schematic")
 
 **LICENSE - "MIT License"**
 
