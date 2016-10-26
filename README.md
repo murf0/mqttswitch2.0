@@ -1,22 +1,36 @@
 **mqttSwitch2.0**
 ==========
-Based on the [MQTT library for the ESP8266 ](https://github.com/tuanpmt/esp_mqtt) (thanks!) (Saved as a mangled)
-
 **Features:**
 
-Status of GPIO pins as published mqtt-message
-Set status of arbitrary GPIO pin (on-off for now) via MQtt Message (Set at compiletime capabilities)
+ESP8266
+* Status of GPIO pins as published mqtt-message
+* Capability of esp sent on boot to mqtt broker
+* Set status of GPIO pin (on-off for now) via MQtt Message (Set at compiletime capabilities)
+* WifiManager with Mqtt settings available
+* OTA prepared (For boards with more than 4mbit memory)
+* Mangled version of [MQTT library for the ESP8266 ](https://github.com/tuanpmt/esp_mqtt) library included. Will now work with Arduino ESP8266 SDK. (after a slight mod to platform.txt)
+* Mqtt with SSL enabled only
+* Mqtt with username + password
 
-Mangled version of [MQTT library for the ESP8266 ](https://github.com/tuanpmt/esp_mqtt) library included. Will now work with Arduino ESP8266 SDK. (after a slight mod)
+HTML
+* Java-script enabled interface to control multiple switches. Uses Getvariables for username/password
+* Nice-name for each switch configured here
+* No webserver required everything is handled in web-browser
+
+OTA Firmwarecheck
+* php required, script included based on the standard examples.
+
 
 **Installation**
 (Instructions for macOS)
-* edit: ~/Library/Arduino15/packages/esp8266/hardware/esp8266/2.3.0/platform.txt change -laxtls to -lssl
- * symlink in Mqtt library ln -s $(pwd)/lib/mqtt ~/Documents/Arduino/libraries/mqtt
+edit: ~/Library/Arduino15/packages/esp8266/hardware/esp8266/2.3.0 platform.txt  add "-lssl --allow-multiple-definition" to the end of the Linker row. (the row begins with compiler.c.elf.libs=)
+See http://www.delorie.com/gnu/docs/binutils/ld_3.html for information. The linker uses the first found definition)
+symlink in Mqtt library "ln -s $(pwd)/lib/mqtt ~/Documents/Arduino/libraries/mqtt" or move it there
 
 **Author:**
 [Mikael "Murf" Mellgren](https://murf.se)
 
+Based on the [MQTT library for the ESP8266 ](https://github.com/tuanpmt/esp_mqtt) (thanks!) (Saved as a mangled)
 
 **Hardware**
 GPIO2 is connected to a NPN transistor. Base Collector Emmiter. GPIO2 to 1k resistor to Base of a NPN 3906 Transistor. Collector is conneted to Ground, Emittor is connected to the Relay. groound of relay to 5.0v (USB)

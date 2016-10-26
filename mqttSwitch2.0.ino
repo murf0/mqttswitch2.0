@@ -9,8 +9,9 @@
 
 /*
    FIX The SDK
-   edit: ~/Library/Arduino15/packages/esp8266/hardware/esp8266/2.3.0/platform.txt  "-lssl -z muldefs" to the end
-   symlin in Mqtt library ln -s $(pwd)/lib/mqtt ~/Documents/Arduino/libraries/mqtt
+   edit: ~/Library/Arduino15/packages/esp8266/hardware/esp8266/2.3.0/platform.txt  add "-lssl --allow-multiple-definition" to the end of the Linker row. (the row begins with compiler.c.elf.libs)
+   See http://www.delorie.com/gnu/docs/binutils/ld_3.html for information. (The linker uses the first found definition)
+   symlink in Mqtt library "ln -s $(pwd)/lib/mqtt ~/Documents/Arduino/libraries/mqtt" or move it there
 
 */
 
