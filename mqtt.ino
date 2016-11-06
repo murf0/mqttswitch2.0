@@ -1,4 +1,5 @@
 #include <ArduinoJson.h>          //https://github.com/bblanchon/ArduinoJson
+#include <WiFiManager.h>          //https://github.com/tzapu/WiFiManager
 #include <c_types.h>
 #include <os_type.h>
 #include <mem.h>
@@ -34,7 +35,7 @@ char subtopic[64];
 char statustopic[64];
 char registertopic[64];
 MQTT_Client mqttClient;
-
+int RESET=0;
 
 /*Set up debug messages*/
 #define dbg 1
@@ -67,17 +68,41 @@ void btnPressed() {
   DynamicJsonBuffer jsonBuffer2;
   JsonObject& jsonmsgresponse = jsonBuffer2.createObject();
   JsonObject& data = jsonmsgresponse.createNestedObject((const char*)mqttcfg.client_id);
-  if(digitalRead(external_relay) == HIGH) {
-    //Serial.println("BTN: Turning Relay OFF");
-    digitalWrite(external_relay,LOW);
-    data["GPIO02"] = "OFF";
-  } else if(digitalRead(external_relay) == LOW) {
-    //Serial.println("BTN: Turning Relay ON");
-    digitalWrite(external_relay,HIGH);
-    data["GPIO02"] = "ON";
-  }
+  #ifdef NPN
+    if(digitalRead(external_relay) == LOW) {
+      pinMode(external_relay, INPUT);
+      data["GPIO02"] = "OFF";
+    } else {
+      pinMode(external_relay, OUTPUT);
+      digitalWrite(external_relay,LOW);
+      data["GPIO02"] = "ON";
+    }
+    
+  #else
+    if(digitalRead(external_relay) == HIGH) {
+      //Serial.println("BTN: Turning Relay OFF");
+      digitalWrite(external_relay,LOW);
+      data["GPIO02"] = "OFF";
+    } else if(digitalRead(external_relay) == LOW) {
+      //Serial.println("BTN: Turning Relay ON");
+      digitalWrite(external_relay,HIGH);
+      data["GPIO02"] = "ON";
+    }
+  #endif
   jsonmsgresponse.printTo(temp,sizeof(temp));
   MQTT_Publish(&mqttClient, statustopic, temp, os_strlen(temp), 2, 0);
+  RESET++;
+  Serial.println(RESET);
+  if( RESET > 9) {
+      WiFiManager wifiManager;
+      if (!wifiManager.startConfigPortal("OnDemandAP")) {
+          Serial.println("failed to connect and hit timeout");
+          delay(3000);
+          //reset and try again, or maybe put it to deep sleep
+          ESP.reset();
+          delay(5000);
+      }  
+  }
 }
 
 void mqttConnectedCb(uint32_t *args) {
@@ -161,14 +186,23 @@ void mqttDataCb(uint32_t *args, const char* topic, uint32_t topic_len, const cha
     if(jsonmsg.containsKey("GPIO02")) {
       Serial.println("MQTT: Testing GPIO02 ON");
       if(strcmp(jsonmsg["GPIO02"],"ON")==0) {
-          digitalWrite(2,HIGH);
+          #ifdef NPN
+            pinMode(external_relay, OUTPUT);
+            digitalWrite(2,LOW);
+          #else
+            digitalWrite(2,HIGH);
+          #endif
           datamsgresponse["GPIO02"] = "ON";
           Serial.println("MQTT: GPIO2 == ON");
           sendmsg=true;
       }
       Serial.println("MQTT: Testing GPIO02 OFF");
       if(strcmp(jsonmsg["GPIO02"],"OFF")==0) {
-          digitalWrite(2,LOW);
+          #ifdef NPN
+            pinMode(external_relay, INPUT);
+          #else
+            digitalWrite(2,LOW);
+          #endif
           datamsgresponse["GPIO02"] = "OFF";
           Serial.println("MQTT: GPIO2 == OFF");
           sendmsg=true;
@@ -197,9 +231,18 @@ void mqttDataCb(uint32_t *args, const char* topic, uint32_t topic_len, const cha
 
 }
 
+void mqttTimeoutCb(uint32_t *args) {
+  Serial.print("MQTT: mqttTimeoutCb");
+  // Since we timed out the MQTT login/or connection. Restart the AP and try again.
+  MQTT_Client* client = (MQTT_Client*)args;
+  WiFiManager wifiManager;
+  wifiManager.resetSettings();
+  ESP.restart();
+}
+
 void  init_mqtt(void) {
     os_sprintf((char*)mqttcfg.client_id, "%08X", system_get_chip_id());
-    Serial.print("CHIPID: ");
+    Serial.print("MQTT: ClientID ");
     Serial.println((char*)mqttcfg.client_id);
     
     mqttcfg.mqtt_keepalive=120;
@@ -231,6 +274,8 @@ void  init_mqtt(void) {
     MQTT_OnPublished(&mqttClient, mqttPublishedCb);
     Serial.println("MQTT; MQTT_OnData");
     MQTT_OnData(&mqttClient, mqttDataCb);
+    Serial.println("MQTT: MQTT_OnTimeout");
+    MQTT_OnTimeout(&mqttClient, mqttTimeoutCb);
     Serial.println("MQTT: MQTT_Connect");
     MQTT_Connect(&mqttClient);
       

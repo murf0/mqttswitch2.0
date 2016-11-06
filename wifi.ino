@@ -13,10 +13,10 @@ void saveConfigCallback () {
 }
 
 void setup_wifi() {
-  char mqtt_server[64];
-  char mqtt_username[32];
-  char mqtt_password[32];
-  char mqtt_port[6];
+  char mqtt_server[64] = MQTT_SERVER;
+  char mqtt_username[32] = MQTT_USER;
+  char mqtt_password[32] = MQTT_PASSWORD;
+  char mqtt_port[6] = MQTT_PORT;
   
     //clean FS, for testing
   //SPIFFS.format();
@@ -60,10 +60,10 @@ void setup_wifi() {
   // The extra parameters to be configured (can be either global or just in the setup)
   // After connecting, parameter.getValue() will get you the configured value
   // id/name placeholder/prompt default length
-  WiFiManagerParameter custom_mqtt_server("server", "mqtt Server", "MQTT_SERVER", 64);
-  WiFiManagerParameter custom_mqtt_port("port", "mqtt port", "MQTT_PORT", 6);
-  WiFiManagerParameter custom_mqtt_username("username", "mqtt Username", "MQTT_USER", 32);
-  WiFiManagerParameter custom_mqtt_password("password", "mqtt Password", "MQTT_PASSWORD", 32);
+  WiFiManagerParameter custom_mqtt_server("server", "mqtt Server", mqtt_server, 64);
+  WiFiManagerParameter custom_mqtt_port("port", "mqtt port", mqtt_port, 6);
+  WiFiManagerParameter custom_mqtt_username("username", "mqtt Username", mqtt_username, 32);
+  WiFiManagerParameter custom_mqtt_password("password", "mqtt Password", mqtt_password, 32);
 
   //WiFiManager
   //Local intialization. Once its business is done, there is no need to keep it around
