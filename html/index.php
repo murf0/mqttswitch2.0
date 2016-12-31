@@ -146,9 +146,16 @@
 					console.log("Adress:" + adress);
 					//Check if the message is on or off status message.
 					for (var OL in msgjson[key]) {
-						if(msgjson[key][OL] === "ON" || msgjson[key][OL] === "OFF") {
+						if(msgjson[key][OL] === "ON") {
+                            NO_OUTPUT = "true";
+                            console.log("ON");
+                            document.getElementById(key+"_OFF").style.backgroundColor=document.getElementById(key+"_ON").style.backgroundColor;
+                            document.getElementById(key+"_ON").style.backgroundColor="#00cc00";
+                        } else if (msgjson[key][OL] === "OFF") {
 							NO_OUTPUT = "true";
-							console.log("ON or OFF");
+							console.log("OFF");
+                            document.getElementById(key+"_ON").style.backgroundColor=document.getElementById(key+"_OFF").style.backgroundColor;
+                            document.getElementById(key+"_OFF").style.backgroundColor="#ff0000";
 						}
 					}
 					//check if the device is offline (LWT message from prev connected device)
@@ -158,14 +165,16 @@
 					}
 					for (var key2 in msgjson[key]["Capability"]) {
 						var GPIO=msgjson[key]["Capability"][key2];
+                        //Request Status Message
 						if(NOTFIRST==="true") {
 							output = output + "<label class=\"nicename\"></label>";
 						}
                         if(debug === "true") {
 						  output = output + "<label class=\"gpio\">" + key2 +"</label>"
                         }
-                        output = output + "<button onclick='publish(\"{\\\""+key2+"\\\":\\\"ON\\\"}\",\""+adress+"\",2,false);'>ON</button>";
-						output = output + "<button onclick='publish(\"{\\\""+key2+"\\\":\\\"OFF\\\"}\",\""+adress+"\",2,false);'>OFF</button>";
+                        output = output + "<button id=\"" + key + "_ON\" onclick='publish(\"{\\\""+key2+"\\\":\\\"ON\\\"}\",\""+adress+"\",2,false);'>ON</button>";
+                        console.log("<button id=\"" + key + "_ON\" onclick='publish(\"{\\\""+key2+"\\\":\\\"ON\\\"}\",\""+adress+"\",2,false);'>ON</button>");
+						output = output + "<button id=\"" + key + "_OFF\" onclick='publish(\"{\\\""+key2+"\\\":\\\"OFF\\\"}\",\""+adress+"\",2,false);'>OFF</button>";
 						output = BR + output;
 						NOTFIRST="true";
 					}
@@ -176,6 +185,7 @@
 					if(NO_OUTPUT !== "true") {
 						document.getElementById("BUTTONS").innerHTML = output + document.getElementById("BUTTONS").innerHTML;
 						console.log(output);
+                        publish("{\""+key2+"\":\"STATUS\"}",adress,2,false);
 					}
 				}
 			} catch (e) {

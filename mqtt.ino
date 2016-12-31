@@ -34,6 +34,9 @@ MQTTCFG mqttcfg;
 char subtopic[64];
 char statustopic[64];
 char registertopic[64];
+int GPIO2_status = 0;
+int GPIO13_status = 0;
+
 MQTT_Client mqttClient;
 int RESET=0;
 
@@ -173,6 +176,7 @@ void mqttDataCb(uint32_t *args, const char* topic, uint32_t topic_len, const cha
     Commands available is: 
     {\"GPIO02\":\"ON\"}
     {\"GPIO02\":\"OFF\"}
+    {\"GPIO02\":\"STATUS\"}
     */
 
     DynamicJsonBuffer jsonBuffer;
@@ -194,6 +198,7 @@ void mqttDataCb(uint32_t *args, const char* topic, uint32_t topic_len, const cha
           #endif
           datamsgresponse["GPIO02"] = "ON";
           Serial.println("MQTT: GPIO2 == ON");
+          GPIO2_status = 1;
           sendmsg=true;
       }
       Serial.println("MQTT: Testing GPIO02 OFF");
@@ -205,6 +210,18 @@ void mqttDataCb(uint32_t *args, const char* topic, uint32_t topic_len, const cha
           #endif
           datamsgresponse["GPIO02"] = "OFF";
           Serial.println("MQTT: GPIO2 == OFF");
+          GPIO2_status = 0;
+          sendmsg=true;
+      }
+      Serial.println("MQTT: Testing GPIO02 STATUS");
+      if(strcmp(jsonmsg["GPIO02"],"STATUS")==0) {
+          if(GPIO2_status == 0) {
+            datamsgresponse["GPIO02"] = "OFF";
+            Serial.println("MQTT: GPIO2 == OFF");
+          } else {
+            datamsgresponse["GPIO02"] = "ON";
+            Serial.println("MQTT: GPIO2 == ON");
+          }
           sendmsg=true;
       }
     }
@@ -214,6 +231,7 @@ void mqttDataCb(uint32_t *args, const char* topic, uint32_t topic_len, const cha
           digitalWrite(13,HIGH);
           datamsgresponse["GPIO13"] = "ON";
           Serial.println("MQTT: GPI13 == ON");
+          GPIO13_status = 1;
           sendmsg=true;
       }
       Serial.println("MQTT: Testing GPIO13 OFF");
@@ -221,6 +239,18 @@ void mqttDataCb(uint32_t *args, const char* topic, uint32_t topic_len, const cha
           digitalWrite(13,LOW);
           datamsgresponse["GPIO13"] = "OFF";
           Serial.println("MQTT: GPI13 == OFF");
+          GPIO13_status = 0;
+          sendmsg=true;
+      }
+      Serial.println("MQTT: Testing GPIO013 STATUS");
+      if(strcmp(jsonmsg["GPIO13"],"STATUS")==0) {
+          if(GPIO13_status == 0) {
+            datamsgresponse["GPIO13"] = "OFF";
+            Serial.println("MQTT: GPI13 == OFF");
+          } else {
+            datamsgresponse["GPIO13"] = "ON";
+            Serial.println("MQTT: GPI13 == ON");
+          }
           sendmsg=true;
       }
     }
@@ -235,8 +265,8 @@ void mqttTimeoutCb(uint32_t *args) {
   Serial.print("MQTT: mqttTimeoutCb");
   // Since we timed out the MQTT login/or connection. Restart the AP and try again.
   MQTT_Client* client = (MQTT_Client*)args;
-  WiFiManager wifiManager;
-  wifiManager.resetSettings();
+  //WiFiManager wifiManager;
+  //wifiManager.resetSettings();
   ESP.restart();
 }
 
