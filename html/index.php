@@ -149,12 +149,12 @@
 						if(msgjson[key][OL] === "ON") {
                             NO_OUTPUT = "true";
                             console.log("ON");
-                            document.getElementById(key+"_OFF").style.backgroundColor=document.getElementById(key+"_ON").style.backgroundColor;
+                            document.getElementById(key+"_OFF").style.backgroundColor="#707070";
                             document.getElementById(key+"_ON").style.backgroundColor="#00cc00";
                         } else if (msgjson[key][OL] === "OFF") {
 							NO_OUTPUT = "true";
 							console.log("OFF");
-                            document.getElementById(key+"_ON").style.backgroundColor=document.getElementById(key+"_OFF").style.backgroundColor;
+                            document.getElementById(key+"_ON").style.backgroundColor="#707070";
                             document.getElementById(key+"_OFF").style.backgroundColor="#ff0000";
 						}
 					}
