@@ -39,6 +39,7 @@ int GPIO13_status = 0;
 
 MQTT_Client mqttClient;
 int RESET=0;
+volatile long LASTRESETTIME=0;
 
 /*Set up debug messages*/
 #define dbg 1
@@ -65,7 +66,14 @@ void btnPressed() {
   if(debounce) {
     return; 
   }
-  //USING npn 2N3904
+  if((millis() - LASTRESETTIME) <= 10000) {
+    RESET++;
+  } else {
+    RESET=0;
+  }
+  LASTRESETTIME = millis();
+  
+  //USING npn 2N3906
   char temp[128];
   //Serial.println("BTN: btnPressed");
   DynamicJsonBuffer jsonBuffer2;
@@ -94,17 +102,11 @@ void btnPressed() {
   #endif
   jsonmsgresponse.printTo(temp,sizeof(temp));
   MQTT_Publish(&mqttClient, statustopic, temp, os_strlen(temp), 2, 0);
-  RESET++;
   Serial.println(RESET);
   if( RESET > 9) {
       WiFiManager wifiManager;
-      if (!wifiManager.startConfigPortal("OnDemandAP")) {
-          Serial.println("failed to connect and hit timeout");
-          delay(3000);
-          //reset and try again, or maybe put it to deep sleep
-          ESP.reset();
-          delay(5000);
-      }  
+      wifiManager.resetSettings();
+      ESP.restart();
   }
 }
 
@@ -265,9 +267,6 @@ void mqttTimeoutCb(uint32_t *args) {
   Serial.print("MQTT: mqttTimeoutCb");
   // Since we timed out the MQTT login/or connection. Restart the AP and try again.
   MQTT_Client* client = (MQTT_Client*)args;
-  //WiFiManager wifiManager;
-  //wifiManager.resetSettings();
-  ESP.restart();
 }
 
 void  init_mqtt(void) {

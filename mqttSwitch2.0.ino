@@ -7,7 +7,7 @@
 #include <ESP8266httpUpdate.h>
 #include <Ticker.h>
 
-//#define NPN
+#define NPN
 
 /*
    FIX The SDK
