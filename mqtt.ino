@@ -73,13 +73,12 @@ void btnPressed() {
   }
   LASTRESETTIME = millis();
   
-  //USING npn 2N3906
+  //USING PNP 2N3906
   char temp[128];
   //Serial.println("BTN: btnPressed");
   DynamicJsonBuffer jsonBuffer2;
   JsonObject& jsonmsgresponse = jsonBuffer2.createObject();
   JsonObject& data = jsonmsgresponse.createNestedObject((const char*)mqttcfg.client_id);
-  #ifdef NPN
     if(digitalRead(external_relay) == LOW) {
       pinMode(external_relay, INPUT);
       data["GPIO02"] = "OFF";
@@ -88,18 +87,6 @@ void btnPressed() {
       digitalWrite(external_relay,LOW);
       data["GPIO02"] = "ON";
     }
-    
-  #else
-    if(digitalRead(external_relay) == HIGH) {
-      //Serial.println("BTN: Turning Relay OFF");
-      digitalWrite(external_relay,LOW);
-      data["GPIO02"] = "OFF";
-    } else if(digitalRead(external_relay) == LOW) {
-      //Serial.println("BTN: Turning Relay ON");
-      digitalWrite(external_relay,HIGH);
-      data["GPIO02"] = "ON";
-    }
-  #endif
   jsonmsgresponse.printTo(temp,sizeof(temp));
   MQTT_Publish(&mqttClient, statustopic, temp, os_strlen(temp), 2, 0);
   Serial.println(RESET);
@@ -192,12 +179,8 @@ void mqttDataCb(uint32_t *args, const char* topic, uint32_t topic_len, const cha
     if(jsonmsg.containsKey("GPIO02")) {
       Serial.println("MQTT: Testing GPIO02 ON");
       if(strcmp(jsonmsg["GPIO02"],"ON")==0) {
-          #ifdef NPN
-            pinMode(external_relay, OUTPUT);
-            digitalWrite(2,LOW);
-          #else
-            digitalWrite(2,HIGH);
-          #endif
+          pinMode(external_relay, OUTPUT);
+          digitalWrite(2,LOW);
           datamsgresponse["GPIO02"] = "ON";
           Serial.println("MQTT: GPIO2 == ON");
           GPIO2_status = 1;
@@ -205,11 +188,7 @@ void mqttDataCb(uint32_t *args, const char* topic, uint32_t topic_len, const cha
       }
       Serial.println("MQTT: Testing GPIO02 OFF");
       if(strcmp(jsonmsg["GPIO02"],"OFF")==0) {
-          #ifdef NPN
-            pinMode(external_relay, INPUT);
-          #else
-            digitalWrite(2,LOW);
-          #endif
+          pinMode(external_relay, INPUT);
           datamsgresponse["GPIO02"] = "OFF";
           Serial.println("MQTT: GPIO2 == OFF");
           GPIO2_status = 0;
