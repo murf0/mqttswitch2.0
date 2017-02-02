@@ -7,8 +7,6 @@
 #include <ESP8266httpUpdate.h>
 #include <Ticker.h>
 
-#define NPN
-
 /*
    FIX The SDK
    edit: ~/Library/Arduino15/packages/esp8266/hardware/esp8266/2.3.0/platform.txt  add "-lssl --allow-multiple-definition" to the end of the Linker row. (the row begins with compiler.c.elf.libs)

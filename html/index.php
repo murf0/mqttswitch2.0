@@ -167,6 +167,9 @@
                   if (msgjson[key]["Capability"] === "OFFLINE") {
                       NO_OUTPUT = "true";
                       console.log("OFFLINE");
+                      if (elem !== null) {
+                        elem.parentNode.removeChild(elem);
+                      }
                   }
                   for (var key2 in msgjson[key]["Capability"]) {
                       var GPIO = msgjson[key]["Capability"][key2];

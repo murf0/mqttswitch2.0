@@ -134,6 +134,7 @@ void mqttDisconnectedCb(uint32_t *args) {
   Serial.print("MQTT: mqttDisconnectedCb");
   MQTT_Client* client = (MQTT_Client*)args;
   Serial.println("MQTT: Disconnected");
+  //ESP.restart();
 }
 
 void mqttPublishedCb(uint32_t *args) {
@@ -245,7 +246,8 @@ void mqttDataCb(uint32_t *args, const char* topic, uint32_t topic_len, const cha
 void mqttTimeoutCb(uint32_t *args) {
   Serial.print("MQTT: mqttTimeoutCb");
   // Since we timed out the MQTT login/or connection. Restart the AP and try again.
-  MQTT_Client* client = (MQTT_Client*)args;
+  MQTT_Client* mqttClient = (MQTT_Client*)args;
+  MQTT_Connect(&mqttClient);
 }
 
 void  init_mqtt(void) {
